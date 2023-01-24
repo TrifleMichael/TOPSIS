@@ -1,9 +1,11 @@
 import numpy as np
+import gui
 
+N_FEATURES = 4
 # Macierz jak w filmiku
 matrix = np.array([[250, 16, 12, 5], [200, 16, 8, 3], [300, 32, 16, 4], [275, 32, 8, 4], [225, 16, 16, 2]], dtype=np.float32)
 # Waga kryteriów (dowolne dodatnie wartości)
-criteria_weights = [1/matrix.shape[1] for i in range(matrix.shape[1])]
+criteria_weights = [1/N_FEATURES for i in range(N_FEATURES)]
 # Czy im większe kryterium tym lepsze
 criteria_positive = [False, True, True, True]
 
@@ -62,17 +64,21 @@ def rankOptions(performanceScore):
         scoreCopy[nextBest] = -float("inf")
     return rank
 
+def calculate(matrix):
+    normalize(matrix)
+    applyWeights(matrix)
+    best, worst = idealBestAndWorst(matrix)
+    distToBest = distanceToBest(matrix, best)
+    distToWorst = distanceToWorst(matrix, worst)
+    performanceScore = calculatePerformanceScore(matrix, distToBest, distToWorst)
+    return rankOptions(performanceScore)
 
-normalize(matrix)
-applyWeights(matrix)
-best, worst = idealBestAndWorst(matrix)
-distToBest = distanceToBest(matrix, best)
-distToWorst = distanceToWorst(matrix, worst)
-performanceScore = calculatePerformanceScore(matrix, distToBest, distToWorst)
-rank = rankOptions(performanceScore)
 
 # Wypisuje jakie pozycje w rankingu mają dane opcje z macierzy
 placeName = ["Best:", "Second best:", "Third best", "Fourth best", "Worst"]
-for i in range(len(rank)):
-    print(placeName[i], rank[i])
+
+if __name__ == '__main__':
+    matrix = np.zeros((1, N_FEATURES))
+    app = gui.Gui(matrix, N_FEATURES)
+    app.run()
 
