@@ -9,6 +9,7 @@ def readLabels():
             labels.append(line[:-1])
         else:
             labels.append(line)
+    f.close()
     return labels
 
 LABELS = readLabels()
