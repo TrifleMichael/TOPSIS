@@ -5,7 +5,7 @@ def readLabels():
     labels = []
     f = open("labels.txt", 'r')
     for line in f:
-        if line[-1] == '\0':
+        if line[-1] == '\n':
             labels.append(line[:-1])
         else:
             labels.append(line)
