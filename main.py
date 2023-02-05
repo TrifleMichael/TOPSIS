@@ -1,17 +1,17 @@
 import numpy as np
 import gui
 
-LABELS = ["weight", "price", "looks", "durability", "quality"]
-# Macierz jak w filmiku
-# matrix = np.array([[250, 16, 12, 5], [200, 16, 8, 3], [300, 32, 16, 4], [275, 32, 8, 4], [225, 16, 16, 2]], dtype=np.float32)
-# # Waga kryteriów (dowolne dodatnie wartości)
-# criteria_weights = [1/N_FEATURES for i in range(N_FEATURES)]
-# # Czy im większe kryterium tym lepsze
-# criteria_positive = [False, True, True, True]
+def readLabels():
+    labels = []
+    f = open("labels.txt", 'r')
+    for line in f:
+        if line[-1] == '\0':
+            labels.append(line[:-1])
+        else:
+            labels.append(line)
+    return labels
 
-# def showMatrix(matrix=matrix):
-#     for row in matrix:
-#         print(row)
+LABELS = readLabels()
 
 def normalize(matrix):
     for col in range(matrix.shape[1]):

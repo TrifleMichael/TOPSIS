@@ -1,0 +1,5 @@
+weight
+price
+looks
+durability
+quality
