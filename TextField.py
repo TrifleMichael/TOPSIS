@@ -3,7 +3,7 @@ import arcade
 
 class TextField:
 
-    def __init__(self, window, i, j ,x, y, a):
+    def __init__(self, window, i, j, x, y, a, label):
         self.window = window
         self.x = x
         self.y = y
@@ -13,8 +13,10 @@ class TextField:
         self.width, self.height = self.window.get_size()
         self.clicked = False
         self.active = False
+        self.label = label
         self.content = ""
         self.key_map = {
+            arcade.key.PERIOD: '.',
             arcade.key.KEY_0: '0',
             arcade.key.KEY_1: '1',
             arcade.key.KEY_2: '2',
@@ -27,7 +29,7 @@ class TextField:
             arcade.key.KEY_9: '9',
             arcade.key.BACKSPACE: 'bs'
         }
-        self.font_size = round(self.a*0.33)
+        self.font_size = round(self.a*0.2)
 
     def enable(self):
         self.active = True
@@ -41,11 +43,14 @@ class TextField:
 
     def on_draw(self):
         if self.active:
+            b = self.a*0.67
             if self.clicked:
-                self._draw_rectangle(self.x, self.y, self.x+self.a, self.y+self.a, arcade.color.WHITE_SMOKE)
+                self._draw_rectangle(self.x, self.y, self.x+self.a, self.y+b, arcade.color.WHITE_SMOKE)
             else:
-                self._draw_rectangle(self.x, self.y, self.x+self.a, self.y+self.a, arcade.color.BONE)
-            arcade.draw_text(self.content, self.x, self.y+self.a//2-self.font_size//2, color=arcade.color.BLUEBERRY, font_size=self.font_size)
+                self._draw_rectangle(self.x, self.y, self.x+self.a, self.y+b, arcade.color.BONE)
+            arcade.draw_text(self.content, self.x, self.y+b//2-self.font_size//2, color=arcade.color.BLUEBERRY, font_size=self.font_size)
+            arcade.draw_text(self.label, self.x, self.y + self.a*0.83 - self.font_size // 2, color=arcade.color.BONE,
+                             font_size=self.font_size)
 
     def on_key_press(self, symbol: int, modifiers: int):
         if self.active and self.clicked:
@@ -54,8 +59,13 @@ class TextField:
                 if key == 'bs':
                     if len(self.content) > 0:
                         self.content = self.content[:-1]
-                elif len(self.content) < 4:
+                elif key == '.':
+                    if key not in self.content:
+                        self.content += key
+                elif len(self.content) < 6:
                     self.content += key
+            elif symbol == arcade.key.Q:
+                self.click()
 
     def on_mouse_release(self, x: float, y: float, button: int,
                          modifiers: int):
@@ -68,13 +78,13 @@ class TextField:
         self.x *= ratio_w
         self.y *= ratio_h
         self.a *= ratio_w
-        self.font_size = round(self.a*0.33)
+        self.font_size = round(self.a*0.2)
 
     def put_data(self, matrix):
-        if len(self.content) > 0:
-            matrix[self.i, self.j] = int(self.content)
+        if len(self.content) > 0 and self.content != '.':
+            matrix[self.i, self.j] = float(self.content)
         else:
-            matrix[self.i, self.j] = 0
+            matrix[self.i, self.j] = 0.
 
     def _mouse_inside(self, x, y):
         return self.x <= x <= self.x + self.a and self.y <= y <= self.y + self.a

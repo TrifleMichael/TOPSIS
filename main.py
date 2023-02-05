@@ -1,17 +1,17 @@
 import numpy as np
 import gui
 
-N_FEATURES = 4
+LABELS = ["weight", "price", "looks", "durability", "quality"]
 # Macierz jak w filmiku
-matrix = np.array([[250, 16, 12, 5], [200, 16, 8, 3], [300, 32, 16, 4], [275, 32, 8, 4], [225, 16, 16, 2]], dtype=np.float32)
-# Waga kryteriów (dowolne dodatnie wartości)
-criteria_weights = [1/N_FEATURES for i in range(N_FEATURES)]
-# Czy im większe kryterium tym lepsze
-criteria_positive = [False, True, True, True]
+# matrix = np.array([[250, 16, 12, 5], [200, 16, 8, 3], [300, 32, 16, 4], [275, 32, 8, 4], [225, 16, 16, 2]], dtype=np.float32)
+# # Waga kryteriów (dowolne dodatnie wartości)
+# criteria_weights = [1/N_FEATURES for i in range(N_FEATURES)]
+# # Czy im większe kryterium tym lepsze
+# criteria_positive = [False, True, True, True]
 
-def showMatrix(matrix=matrix):
-    for row in matrix:
-        print(row)
+# def showMatrix(matrix=matrix):
+#     for row in matrix:
+#         print(row)
 
 def normalize(matrix):
     for col in range(matrix.shape[1]):
@@ -19,12 +19,12 @@ def normalize(matrix):
         for row in range(matrix.shape[0]):
             matrix[row, col] = matrix[row, col] / denominator
 
-def applyWeights(matrix):
+def applyWeights(matrix, criteria_weights):
     for row in range(matrix.shape[0]):
         for col in range(matrix.shape[1]):
             matrix[row, col] = matrix[row, col] * criteria_weights[col]
 
-def idealBestAndWorst(matrix):
+def idealBestAndWorst(matrix, criteria_positive):
     best = []
     worst = []
     for col in range(matrix.shape[1]):
@@ -64,10 +64,10 @@ def rankOptions(performanceScore):
         scoreCopy[nextBest] = -float("inf")
     return rank
 
-def calculate(matrix):
+def calculate(matrix, criteria_weights, criteria_positive):
     normalize(matrix)
-    applyWeights(matrix)
-    best, worst = idealBestAndWorst(matrix)
+    applyWeights(matrix, criteria_weights)
+    best, worst = idealBestAndWorst(matrix, criteria_positive)
     distToBest = distanceToBest(matrix, best)
     distToWorst = distanceToWorst(matrix, worst)
     performanceScore = calculatePerformanceScore(matrix, distToBest, distToWorst)
@@ -78,7 +78,10 @@ def calculate(matrix):
 placeName = ["Best:", "Second best:", "Third best", "Fourth best", "Worst"]
 
 if __name__ == '__main__':
-    matrix = np.zeros((1, N_FEATURES))
-    app = gui.Gui(matrix, N_FEATURES)
+    with open('items.txt', 'r') as file:
+        items = file.readlines()
+    items = list(map(lambda x: x[:-1], items))
+    matrix = np.zeros((1, len(LABELS)))
+    app = gui.Gui(matrix, len(LABELS), LABELS, items)
     app.run()
 

@@ -2,12 +2,14 @@ import arcade
 
 class ResultsView(arcade.View):
 
-    def __init__(self, window, rank):
+    def __init__(self, window, rank, items):
         super().__init__(window)
         self.rank = rank
         self.window = window
         self.width, self.height = window.get_size()
         self._active = False
+        self.k = 0
+        self.items = items
 
     def update(self, rank):
         self.rank = rank
@@ -21,12 +23,21 @@ class ResultsView(arcade.View):
     def on_draw(self):
         if self._active:
             self._draw_rectangle(0, 0, self.width, self.height, (0, 160, 160, 255))
-            for i, result in enumerate(self.rank):
-                self._draw_result(self.width * 0.05, self.height * (.9 - i * .05), self.width * 0.95, self.height * (.95 - i * .05), str(i+1)+". "+str(result))
+            for i, result in enumerate(self.rank[self.k:self.k+15]):
+                self._draw_result(self.width * 0.05, self.height * (.9 - i * .05), self.width * 0.95, self.height * (.95 - i * .05), str(i+1+self.k)+". "+self._get_text(result))
+
+    def _get_text(self, num):
+        if num < len(self.items):
+            return self.items[num]
+        else:
+            return "item "+str(num)
 
     def on_resize(self, width: int, height: int):
         self.width = width
         self.height = height
+
+    def on_mouse_scroll(self, x: int, y: int, scroll_x: int, scroll_y: int):
+        self.k = max(min(int(self.k-scroll_y), len(self.rank)), 0)
 
     def _draw_rectangle(self, x1, y1, x2, y2, color=arcade.color.SPANISH_VIOLET):
         point_list = (

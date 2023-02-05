@@ -5,14 +5,19 @@ from TextField import TextField
 
 class TableView(arcade.View):
 
-    def __init__(self, window, number, n_features):
+    def __init__(self, window, number, n_features, labels, items):
         super().__init__(window)
+        self.items = items
+        self.width, self.height = window.get_size()
+        self.x = self.width * 0.05
+        self.y = self.height * 0.9
+        self.font_size = round(self.height * 0.1)
         self.number = number
         self.window = window
         self.active = False
         w, h = window.get_size()
         r = 0.8
-        self.text_fields = [TextField(window, number, i, i*(w/n_features)+w//n_features*(1-r)/2, h//2-w//n_features*r//2, w//n_features*r) for i in range(n_features)]
+        self.text_fields = [TextField(window, number, i, i*(w/n_features)+w//n_features*(1-r)/2, h//2-w//n_features*r//2, w//n_features*r, labels[i]) for i in range(n_features)]
         self.n_features = n_features
 
     def enable(self):
@@ -35,6 +40,15 @@ class TableView(arcade.View):
             self._draw_rectangle(0, 0, w, h, (0, 160, 160, 255))
             for text_field in self.text_fields:
                 text_field.on_draw()
+            if self.number == -1:
+                arcade.draw_text("Features Weights", self.x, self.y - self.font_size // 2, color=arcade.color.BONE,
+                                 font_size=self.font_size)
+            elif self.number < len(self.items):
+                arcade.draw_text(self.items[self.number], self.x, self.y - self.font_size // 2, color=arcade.color.BONE,
+                             font_size=self.font_size)
+            else:
+                arcade.draw_text('item '+str(self.number), self.x, self.y - self.font_size // 2, color=arcade.color.BONE,
+                             font_size=self.font_size)
 
     def on_key_press(self, symbol: int, modifiers: int):
         if self.active:
@@ -42,9 +56,13 @@ class TableView(arcade.View):
                 text_field.on_key_press(symbol, modifiers)
 
     def on_resize(self, width: int, height: int):
-        if self.active:
-            for text_field in self.text_fields:
-                text_field.on_resize(width, height)
+        for text_field in self.text_fields:
+            text_field.on_resize(width, height)
+        ratio_w, ratio_h = width / self.width, height / self.height
+        self.width, self.height = width, height
+        self.x *= ratio_w
+        self.y *= ratio_h
+        self.font_size = round(self.font_size * ratio_w)
 
     def on_mouse_release(self, x: float, y: float, button: int,
                          modifiers: int):
